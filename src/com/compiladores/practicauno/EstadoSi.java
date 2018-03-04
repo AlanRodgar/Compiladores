@@ -44,12 +44,22 @@ public class EstadoSi {
         
     }
 
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        return hash;
+    public boolean isIncluded(ArrayList<EstadoSi> C){
+        for(EstadoSi estado:C){
+            if(estado.equals(this))
+                return true;
+        }
+        return false;
     }
-
+    
+    public static boolean isIncluded(ArrayList<EstadoSi> C, EstadoSi estado){
+        for(EstadoSi e:C){
+            if(e.equals(estado))
+                return true;
+        }
+        return false;
+    }
+    
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -101,7 +111,6 @@ public class EstadoSi {
         
         return true;
     }
-    
     
     /* Setters y Getters */
 

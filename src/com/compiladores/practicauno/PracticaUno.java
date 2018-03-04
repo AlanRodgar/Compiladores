@@ -15,6 +15,8 @@ public class PracticaUno {
     public static void main(String[] args) {
         // TODO code application logic here
         ArrayList<AFN> fi = new ArrayList<>();
+        ArrayList<AFD> fj = new ArrayList<>();
+        AFD afd;
         int option=-1;
         Teclado teclado = new Teclado();
         
@@ -40,7 +42,7 @@ public class PracticaUno {
                     char s = teclado.getCadena().charAt(0);
                     AFN afn = new AFN(s);
                     fi.add(afn);
-                    System.out.println("AFN basico creado. (ID: "+afn.idAutomata+")");
+                    System.out.println("AFN basico creado. (ID: "+afn.getIdAutomata()+")");
                     try{
                         Thread.sleep(1000);
                     }catch(InterruptedException ie){
@@ -57,9 +59,9 @@ public class PracticaUno {
                     
                     if(fi.size()>1)
                         for(int i=0; i<fi.size(); i++){
-                            if(fi.get(i).idAutomata == id1){
+                            if(fi.get(i).getIdAutomata() == id1){
                                 for(int j=0; j<fi.size(); j++){
-                                    if(fi.get(j).idAutomata==id2){
+                                    if(fi.get(j).getIdAutomata()==id2){
                                         fi.set(i, fi.get(i).unirAFN(fi.get(j)));
                                         System.out.println("Operación finalizada");
                                     }
@@ -79,9 +81,9 @@ public class PracticaUno {
                     
                     if(fi.size()>1)
                         for(int i=0; i<fi.size(); i++){
-                            if(fi.get(i).idAutomata == id1){
+                            if(fi.get(i).getIdAutomata() == id1){
                                 for(int j=0; j<fi.size(); j++){
-                                    if(fi.get(j).idAutomata==id2){
+                                    if(fi.get(j).getIdAutomata()==id2){
                                         fi.set(i, fi.get(i).concatenarAFN(fi.get(j)));
                                         System.out.println("Operación finalizada");
                                     }
@@ -98,7 +100,7 @@ public class PracticaUno {
                     id1 = teclado.getEntero();
                     if(fi.size()>0)
                         for(int i=0; i<fi.size(); i++){
-                            if(fi.get(i).idAutomata == id1){
+                            if(fi.get(i).getIdAutomata() == id1){
                                 fi.set(i, fi.get(i).cerraduraPositiva());
                                 System.out.println("Operación finalizada");
                             } 
@@ -113,7 +115,7 @@ public class PracticaUno {
                     id1 = teclado.getEntero();
                     if(fi.size()>0)
                         for(int i=0; i<fi.size(); i++){
-                            if(fi.get(i).idAutomata == id1){
+                            if(fi.get(i).getIdAutomata() == id1){
                                 fi.set(i, fi.get(i).cerraduraKleene());
                                 System.out.println("Operación finalizada");
                             } 
@@ -128,7 +130,7 @@ public class PracticaUno {
                     id1 = teclado.getEntero();
                     if(fi.size()>0)
                         for(int i=0; i<fi.size(); i++){
-                            if(fi.get(i).idAutomata == id1){
+                            if(fi.get(i).getIdAutomata() == id1){
                                 fi.set(i, fi.get(i).opcional());
                                 System.out.println("Operación finalizada");
                             } 
@@ -145,7 +147,7 @@ public class PracticaUno {
                     id1 = teclado.getEntero();
                     if(fi.size()>0){
                         for(int i=0; i<fi.size(); i++){
-                            if(fi.get(i).idAutomata == id1){
+                            if(fi.get(i).getIdAutomata() == id1){
                                 if(fi.get(i).validarCadena(cadena)){
                                     System.out.println("La cadena es aceptada por el automata.");
                                     break;
@@ -174,28 +176,61 @@ public class PracticaUno {
                         System.out.println("Teclea el id del AFN "+i+": ");
                         idAfn[i] = teclado.getEntero();
                     }
-                    AFN afnLex = new AFN();
-                    afnLex = afnLex.unirAfnLex(fi, idAfn);
+                    AFN afnLex;
+                    afnLex = AFN.unirAfnLex(fi, idAfn);
                     fi.add(afnLex);
-                    System.out.println("AFN basico creado. (ID: "+afnLex.idAutomata+")");
+                    System.out.println("AFN basico creado. (ID: "+afnLex.getIdAutomata()+")");
                     try{
                         Thread.sleep(1000);
                     }catch(InterruptedException ie){
                         System.err.println(ie.getStackTrace());
                     }
-                    //fi.get(0).getAFD(fi.get(0));
-                    break;
+                break;
                 
                 case 9:
-                    System.out.println("Hasta luego.");
-                    //fi.get(0).getAFD(fi.get(0));
+                    System.out.println("Convertir AFN a AFD.");
+                    System.out.print("Telcea el ID del AFN a convertir: ");
+                    id1 = teclado.getEntero();
+                    for(AFN f: fi){
+                        if(f.getIdAutomata() == id1){
+                            afd = f.getAFD();
+                            fj.add(afd);
+                            break;
+                        }else{
+                            //System.out.println("Lo siento, no existe un AFN con ese ID.");
+                        }
+                    }
                     break;
                 
                 case 10:
-                    System.out.println("Hasta luego.");
-                    //fi.get(0).getAFD(fi.get(0));
+                    int token=-1;
+                    System.out.println("Validar cadena AFD.");
+                    System.out.print("Teclea la cadena a validar: ");
+                    cadena = teclado.getCadena();
+                    System.out.print("Teclea el ID del AFD: ");
+                    id1 = teclado.getEntero();
+                    if(fj.size()>0){
+                        for(int j=0; j<fj.size(); j++){
+                            if(fj.get(j).getIdAutomata() == id1){
+                                token = fj.get(j).validarCadena(cadena);
+                                if(token>0){
+                                    System.out.println("La cadena es aceptada por el automata. (Token:"+token+")");
+                                    break;
+                                }
+                                else{
+                                    System.out.println("La cadena no es aceptada por el automata.");
+                                    break;
+                                }
+                            }
+                            else
+                                if((j+1)==fj.size())
+                                    System.out.println("Un AFD con ese id no existe");
+                        }
+                    }
+                    else
+                        System.out.println("No hay suficientes AFD creados para realizar esta operacion.");                      
                     break;
-                
+                    
                 case 11:
                     System.out.println("Hasta luego.");
                     //fi.get(0).getAFD(fi.get(0));

@@ -9,7 +9,7 @@ import java.util.Stack;
  */
 public class AFN {
     static int id;
-    int idAutomata;
+    private int idAutomata;
     Estado estadoInicial;
     ArrayList<Character> alfabeto;
     ArrayList<Estado> estadoAceptacion;
@@ -59,6 +59,11 @@ public class AFN {
         /* Agregamos los nuevos estados a la lista de estados del automata */
         estados.add(estadoInicial);
         estados.add(estadoFinal);
+    }
+    
+    public AFN(AFN afn){
+        id++;
+    
     }
     
     /*
@@ -238,10 +243,28 @@ public class AFN {
         }
         return false;
     }
+    
+    public static boolean inside(AFN afn, Estado estado){
+        for(int i=0; i<afn.estados.size(); i++){
+            if(afn.estados.get(i).equals(estado) ){
+                return true;
+            }
+        }
+        return false;
+    }
 
     public boolean inside(char s){
         for(int i=0; i<alfabeto.size();i++){
             if(alfabeto.get(i) == s){
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public static boolean inside(AFN f1, char s){
+        for(int i=0; i<f1.alfabeto.size();i++){
+            if(f1.alfabeto.get(i) == s){
                 return true;
             }
         }
@@ -457,6 +480,39 @@ public class AFN {
         return afd;
     }
     
+    public AFD getAFD(){
+        
+        AFD afd;
+        int aux = 10;
+        /* Asignacion de tokens */
+        for(Estado estado: this.estadoAceptacion){
+            estado.setToken(aux);
+            aux+=10;
+        }
+        
+        /* 1. Se calcula la cerradura epsilon del estado inicial */
+        EstadoSi s0 = new EstadoSi( cerraduraEpsilon(this.estados) );
+        
+        ArrayList<EstadoSi> estadosSi = new ArrayList<>();
+        estadosSi.add(s0);
+        
+        /* 2. Analizar s0 */
+        //ArrayList<EstadoSi> estadosSi = analizarS0(s0);
+        int oldSize= -1, contador=0;
+        do{
+            oldSize = estadosSi.size();
+            estadosSi = analizarEstadoSi(estadosSi, contador++);
+        }while( (contador+1) != estadosSi.size() );
+        afd = new AFD(s0, estadosSi, this.alfabeto);
+        for(EstadoSi estadoSi :afd.estados){
+            if(estadoSi.isEstadoAceptacion()){
+                System.out.println("estadoSi: "+estadoSi.getIdEstadoSi()+" token: "+estadoSi.getToken());
+                afd.estadosAceptacion.add(estadoSi);
+            }
+        }
+        return afd;
+    }
+    
     /**
      * 
      * @param estadosSi conjunto de estados Si
@@ -511,31 +567,43 @@ public class AFN {
         return estadosSi;
     }
 
-    public AFN unirAfnLex(ArrayList<AFN> listaAfn, int[] idAfn){
+    public static AFN unirAfnLex(ArrayList<AFN> listaAfn, int[] idAfn){
         
-        Estado nuevoInicio = new Estado();
         AFN afn = new AFN();
+        Estado nuevoInicio = new Estado();
+        afn.estadoInicial = nuevoInicio;
+        afn.estados.add(nuevoInicio);
         for(int i=0; i<idAfn.length; i++){
-            afn = unirAfnLex(listaAfn.get(idAfn[i]));
+            for(int j=0; j<listaAfn.size(); j++){
+                if(listaAfn.get(j).idAutomata == idAfn[i])
+                    afn = unirAfnLex(afn, listaAfn.get(j));
+            }
         }
         return afn;
     }
     
-    public  AFN unirAfnLex(AFN f2){
+    public static AFN unirAfnLex(AFN f1, AFN f2){
         
-        Estado nuevoInicio = new Estado();
-        nuevoInicio.addTransicion(Epsilon.EPSILON, this.estadoInicial);
-        nuevoInicio.addTransicion(Epsilon.EPSILON, f2.estadoInicial);
         
-        this.estadoInicial = nuevoInicio;
-        this.estados.addAll(f2.estados);
+        //nuevoInicio.addTransicion(Epsilon.EPSILON, f1.estadoInicial);
+        f1.estadoInicial.addTransicion(Epsilon.EPSILON, f2.estadoInicial);
         
+        //f1.estadoInicial = nuevoInicio;
+        for (Estado estado : f2.estados) {
+            if( !inside(f1, estado) ) f1.estados.add(estado);
+            f1.estados.addAll(f2.estados);
+        }
+        f1.estadoAceptacion.addAll(f2.estadoAceptacion);
         /* Validar que el usuario no meta caracteres duplicados al alfabeto */
         // Se puede utilizar la clase HashSet para optimizar ya que es poco eficiente este algoritmo */
         for(int i=0; i<f2.alfabeto.size();i++){
-            if(!inside(f2.alfabeto.get(i))) this.alfabeto.add(f2.alfabeto.get(i));
+            if(!inside(f1, f2.alfabeto.get(i))) f1.alfabeto.add(f2.alfabeto.get(i));
         }
-        this.estados.add(nuevoInicio);
-        return this;
+        //f1.estados.add(nuevoInicio);
+        return f1;
     }    
+
+    public int getIdAutomata() {
+        return idAutomata;
+    }
 }
