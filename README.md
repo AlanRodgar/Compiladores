@@ -1,8 +1,13 @@
-## Welcome to GitHub Pages
+## Proyecto de Compiladores
 
-You can use the [editor on GitHub](https://github.com/AlanRodgar/Compiladores/edit/master/README.md) to maintain and preview the content for your website in Markdown files.
+### Etapas del desarrollo
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+1. Creador de automatas finitos no deterministas.
+2. Converción de AFN a AFD
+3. Análisis Léxico
+4. Análisis Sintáctico
+5. Análisis Semántico
+
 
 ### Markdown
 
